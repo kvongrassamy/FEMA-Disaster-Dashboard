@@ -14,7 +14,8 @@ server <- function(input, output, session) {
     
     # Reactive expression for the data subsetted to what the user selected
     filteredData <- reactive({
-        renter_zip[(renter_zip$Total_Approved_IHP_Amount >= input$range[1]) & (renter_zip$Total_Approved_IHP_Amount <= input$range[2]),]
+        renter_zip[(renter_zip$Total_Approved_IHP_Amount >= input$range[1]) & (renter_zip$Total_Approved_IHP_Amount <= input$range[2]) & (renter_zip$State == input$state),] 
+            
     })
     
     # This reactive expression represents the palette function,
@@ -39,9 +40,14 @@ server <- function(input, output, session) {
         pal <- colorpal()
         
         leafletProxy("map", data = filteredData()) %>%
+            addTiles(
+                urlTemplate = "//{s}.tiles.mapbox.com/v3/jcheng.map-5ebohr46/{z}/{x}/{y}.png",
+                attribution = 'Maps by <a href="http://www.mapbox.com/">Mapbox</a>'
+            ) %>% 
+            setView(lng = -93.85, lat = 37.45, zoom = 4) %>% 
             clearShapes() %>%
-            addCircles(lng=~Longitude, lat=~Latitude,radius = ~10^Total_Approved_IHP_Amount/10, weight = 1, color = "#777777",
-                       fillColor = ~pal(Total_Approved_IHP_Amount), fillOpacity = 0.7, popup = ~paste(Total_Approved_IHP_Amount)
+            addCircles(lng=~Longitude, lat=~Latitude,radius = ~(sqrt(Total_Approved_IHP_Amount)*100)/3, weight = 1, color = "#777777",
+                       fillColor = ~pal(Total_Approved_IHP_Amount), fillOpacity = 0.9, popup = ~paste(Total_Approved_IHP_Amount)
             )
     })
     

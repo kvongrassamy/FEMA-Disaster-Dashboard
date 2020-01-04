@@ -14,8 +14,11 @@ ui <- bootstrapPage(
   tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
   leafletOutput("map", width = "100%", height = "100%"),
   absolutePanel(top = 10, right = 10,
-                sliderInput("Total_Approved_IHP_Amount", "Approved Amt", min= min(renter_zip$Total_Approved_IHP_Amount),max= max(renter_zip$Total_Approved_IHP_Amount),
+                sliderInput("range", "IHP Approved Amt", min= min(renter_zip$Total_Approved_IHP_Amount),max= max(renter_zip$Total_Approved_IHP_Amount),
                             value = range(renter_zip$Total_Approved_IHP_Amount), step = 0.1
+                ),
+                selectInput("state", "State Abbreviation",
+                            unique(renter_zip$State)
                 ),
                 selectInput("colors", "Color Scheme",
                             rownames(subset(brewer.pal.info, category %in% c("seq", "div")))

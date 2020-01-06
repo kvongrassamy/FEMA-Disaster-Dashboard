@@ -9,53 +9,52 @@
 
 library(shiny)
 
-# Define server logic required to draw a histogram
-server <- function(input, output, session) {
+
+server <-  function(input, output, session) {
     
     # Reactive expression for the data subsetted to what the user selected
     filteredData <- reactive({
-        renter_zip[(renter_zip$Total_Approved_IHP_Amount >= input$range[1]) & (renter_zip$Total_Approved_IHP_Amount <= input$range[2]) & (renter_zip$State == input$state),] 
+        owner_zip[(owner_zip$Total_Approved_IHP_Amount >= input$range[1]) & (owner_zip$Total_Approved_IHP_Amount <= input$range[2])
+                   & (owner_zip$State %in% input$state) & (owner_zip$incidentType %in% input$incident),]
             
     })
     
-    # This reactive expression represents the palette function,
-     #which changes as the user makes selections in UI.
+    
     colorpal <- reactive({
-        colorNumeric(input$colors, renter_zip$Total_Approved_IHP_Amount)
+        colorNumeric(input$colors, owner_zip$Total_Approved_IHP_Amount)
     })
     
     output$map <- renderLeaflet({
-        # Use leaflet() here, and only include aspects of the map that
-        # won't need to change dynamically (at least, not unless the
-        # entire map is being torn down and recreated).
-        leaflet(renter_zip) %>% addTiles() %>%
+        
+        leaflet(owner_zip) %>% addTiles() %>%
             fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))
     })
     
-    # Incremental changes to the map (in this case, replacing the
-    # circles when a new color is chosen) should be performed in
-    # an observer. Each independent set of things that can change
-    # should be managed in its own observer.
+    # Overall map in background
     observe({
         pal <- colorpal()
         
         leafletProxy("map", data = filteredData()) %>%
-            addTiles(
-                urlTemplate = "//{s}.tiles.mapbox.com/v3/jcheng.map-5ebohr46/{z}/{x}/{y}.png",
-                attribution = 'Maps by <a href="http://www.mapbox.com/">Mapbox</a>'
-            ) %>% 
-            setView(lng = -93.85, lat = 37.45, zoom = 4) %>% 
+            addTiles() %>% 
             clearShapes() %>%
+            addWMSTiles(
+                "https://mesonet.agron.iastate.edu/cgi-bin/wms/hrrr/refd.cgi",
+                layers = "refd_0000",
+                options = WMSTileOptions(format = "image/png", transparent = TRUE),
+                attribution = "Weather data © 2012 IEM Nexrad"
+            ) %>%  
+          
             addCircles(lng=~Longitude, lat=~Latitude,radius = ~(sqrt(Total_Approved_IHP_Amount)*100)/3, weight = 1, color = "#777777",
-                       fillColor = ~pal(Total_Approved_IHP_Amount), fillOpacity = 0.9, popup = ~paste(Total_Approved_IHP_Amount)
+                       fillColor = ~pal(Total_Approved_IHP_Amount), fillOpacity = .6, popup = ~paste(round(Total_Approved_IHP_Amount, 2))#State, City, Zip_Code)
             )
     })
     
-    # Use a separate observer to recreate the legend as needed.
+    # map interactions
     observe({
-        proxy <- leafletProxy("map", data = renter_zip)
+        proxy <- leafletProxy("map", data = owner_zip)
         
         # Remove any existing legend, and only if the legend is
+        
         # enabled, create a new one.
         proxy %>% clearControls()
         if (input$legend) {
@@ -64,5 +63,27 @@ server <- function(input, output, session) {
                                  pal=pal, values = ~Total_Approved_IHP_Amount
             )
         }
+        
+        
+        sel_site <- statell[statell$State == input$state, ]
+        isolate({
+            new_zoom <- 6
+            if(!is.null(input$map_zoom)) new_zoom <- input$map_zoom
+            leafletProxy('map') %>%
+                setView(lng = sel_site$state_long, lat = sel_site$state_lat, zoom = new_zoom)
+            
+        })
+        
     })
+    
+    output$scatterState <- renderPlot({
+      # If no zipcodes are in view, don't plot
+      
+      print(xyplot(Total_Damage~incidentBeginDate, data = filteredData(), xlim = range(owner_zip$incidentBeginDate), ylim = range(owner_zip$Total_Damage)))
+    })
+    
+    
 }
+
+
+

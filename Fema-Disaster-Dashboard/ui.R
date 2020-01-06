@@ -14,15 +14,19 @@ ui <- bootstrapPage(
   tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
   leafletOutput("map", width = "100%", height = "100%"),
   absolutePanel(top = 10, right = 10,
-                sliderInput("range", "IHP Approved Amt", min= min(renter_zip$Total_Approved_IHP_Amount),max= max(renter_zip$Total_Approved_IHP_Amount),
-                            value = range(renter_zip$Total_Approved_IHP_Amount), step = 0.1
+                sliderInput("range", "IHP Approved Amt", min= min(owner_zip$Total_Approved_IHP_Amount),max= max(owner_zip$Total_Approved_IHP_Amount),
+                            value = range(owner_zip$Total_Approved_IHP_Amount), step = 100
                 ),
                 selectInput("state", "State Abbreviation",
-                            unique(renter_zip$State)
+                            unique(owner_zip$State), selected = "CA"
+                ),
+                selectInput("incident", "Incedent ",
+                            unique(owner_zip$incidentType), selected = "Fire"
                 ),
                 selectInput("colors", "Color Scheme",
                             rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
                 ),
-                checkboxInput("legend", "Show legend", TRUE)
+                checkboxInput("legend", "Show legend", TRUE),
+                plotOutput("scatterState", height = 250)
   )
 )

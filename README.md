@@ -1,6 +1,15 @@
 # FEMA-Disaster-Dashboard
 
+The dataset is provided by FEMA that show individuals who are homeowners and are approved by FEMA's Individual and Household Program.  To 
+recieve these benefits, a state level disaster would have to occur such as, fires, hurricanes, or tornadoes.  The purpose of this application 
+is for users to be able see which areas are effected by disasters the most.  A special feature of this application shows how much damage economically 
+the area will see on average.  This can help government officals/FEMA to prepare a budget for that area.  It can also provide citizens information 
+and show them the level of property damage.
+
+
 Sources:
+
+https://www.fema.gov/openfema-dataset-housing-assistance-data-owners-v1
 
 https://public.opendatasoft.com/explore/dataset/us-zip-code-latitude-and-longitude/export/
 

@@ -10,7 +10,7 @@
 library(shiny)
 
 
-ui <- bootstrapPage(
+ui <- bootstrapPage(title="FEMA Disaster Relief",
   tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
   leafletOutput("map", width = "100%", height = "100%"),
   absolutePanel(top = 10, right = 10,
@@ -27,6 +27,11 @@ ui <- bootstrapPage(
                             rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
                 ),
                 checkboxInput("legend", "Show legend", TRUE),
-                plotOutput("scatterState", height = 250)
+                dateRangeInput('dateRange',
+                               label = 'Set Date Range for Disaster:',
+                               start = min(owner_zip$incidentBeginDate), end = max(owner_zip$incidentBeginDate),),
+                plotOutput("barplotState", height = 250)
+                
   )
+  #sidebarPanel(bottom=10, left=10, plotOutput("barplotState", height = 250))
 )

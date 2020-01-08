@@ -15,7 +15,8 @@ server <-  function(input, output, session) {
     # Reactive expression for the data subsetted to what the user selected
     filteredData <- reactive({
         owner_zip[(owner_zip$Total_Approved_IHP_Amount >= input$range[1]) & (owner_zip$Total_Approved_IHP_Amount <= input$range[2])
-                   & (owner_zip$State %in% input$state) & (owner_zip$incidentType %in% input$incident),]
+                   & (owner_zip$State %in% input$state) & (owner_zip$incidentType %in% input$incident) & 
+                    (owner_zip$incidentBeginDate >= input$dateRange[1]) & (owner_zip$incidentBeginDate <= input$dateRange[2]),]
             
     })
     
@@ -43,9 +44,11 @@ server <-  function(input, output, session) {
                 options = WMSTileOptions(format = "image/png", transparent = TRUE),
                 attribution = "Weather data © 2012 IEM Nexrad"
             ) %>%  
-          
             addCircles(lng=~Longitude, lat=~Latitude,radius = ~(sqrt(Total_Approved_IHP_Amount)*100)/3, weight = 1, color = "#777777",
-                       fillColor = ~pal(Total_Approved_IHP_Amount), fillOpacity = .6, popup = ~paste(round(Total_Approved_IHP_Amount, 2))#State, City, Zip_Code)
+                       fillColor = ~pal(Total_Approved_IHP_Amount), fillOpacity = .6, popup = ~(paste("Area: ", City, ", ", State, " ", "<br>",
+                                                                                                     "Approved by FEMA: $", Total_Approved_IHP_Amount, "<br>",
+                                                                                                     "Total Number of Damages: ", Total_Damage, "<br>",
+                                                                                                     "Date of Disaster: ", incidentBeginDate))
             )
     })
     
@@ -59,7 +62,7 @@ server <-  function(input, output, session) {
         proxy %>% clearControls()
         if (input$legend) {
             pal <- colorpal()
-            proxy %>% addLegend(position = "bottomright",
+            proxy %>% addLegend(position = "bottomleft", labels = "FEMA IHP Approved Amount",
                                  pal=pal, values = ~Total_Approved_IHP_Amount
             )
         }
@@ -76,11 +79,13 @@ server <-  function(input, output, session) {
         
     })
     
-    output$scatterState <- renderPlot({
+    output$barplotState <- renderPlot({
       # If no zipcodes are in view, don't plot
-      
-      print(xyplot(Total_Damage~incidentBeginDate, data = filteredData(), xlim = range(owner_zip$incidentBeginDate), ylim = range(owner_zip$Total_Damage)))
+      d <- owner_zip[owner_zip$State %in% input$state, ]
+      #pal <- colorpal()
+      print(barplot(table(d$incidentType), ylab="Total Count of Disasters", xlab="Disaster", col=c("#99CCFF", "#6699CC", "#669999", "#66CCCC")))
     })
+    
     
     
 }

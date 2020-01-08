@@ -62,7 +62,7 @@ server <-  function(input, output, session) {
         proxy %>% clearControls()
         if (input$legend) {
             pal <- colorpal()
-            proxy %>% addLegend(position = "bottomleft", labels = "FEMA IHP Approved Amount",
+            proxy %>% addLegend(position = "bottomleft", title = "FEMA IHP Approved Amount",
                                  pal=pal, values = ~Total_Approved_IHP_Amount
             )
         }

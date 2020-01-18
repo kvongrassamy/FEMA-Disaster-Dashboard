@@ -42,11 +42,19 @@ historical <- merge(x=historical, y=zipcode, by = "Zip_Code") %>%
 
 #renter_zip['Owner/Renter'] <- "Renter"
 #owner['Owner/Renter'] <- "Owner"
-
-
+hpi <- read_csv('data/hpi_county.csv')
+# owner_zip$Zip_Code<- as.character(owner_zip$Zip_Code)
 owner_zip <- rbind(owner_zip, historical)
 US <- unique(owner_zip$State)
 
+owner_zip$year <- format(as.Date(owner_zip$incidentBeginDate, format="%d/%m/%Y"),"%Y")
+hpi$year <- type.convert(hpi$year, as.is = TRUE)
+owner_zip$year <- type.convert(owner_zip$year, as.is = TRUE)
+hpi$Zip_Code <- type.convert(hpi$Zip_Code, as.is = TRUE)
+owner_zip$Zip_Code <- type.convert(owner_zip$Zip_Code, as.is = TRUE)
 
+
+owner_zip <- owner_zip %>%
+  inner_join(y=hpi)
 
 #ind <- read.csv('https://www.fema.gov/api/open/v1/IndividualAssistanceHousingRegistrantsLargeDisasters.csv')

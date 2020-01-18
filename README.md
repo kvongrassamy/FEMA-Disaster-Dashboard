@@ -11,6 +11,12 @@ Sources:
 
 https://www.fema.gov/openfema-dataset-housing-assistance-data-owners-v1
 
+https://www.fhfa.gov/DataTools/Downloads/Pages/House-Price-Index-Datasets.aspx
+
 https://public.opendatasoft.com/explore/dataset/us-zip-code-latitude-and-longitude/export/
 
 https://mesonet.agron.iastate.edu/GIS/model.phtml
+
+https://www.census.gov/library/stories/2019/10/key-player-in-disaster-response-the-us-census-bureau.html
+
+https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4471

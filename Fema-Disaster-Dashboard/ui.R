@@ -17,6 +17,9 @@ ui <- bootstrapPage(title="FEMA Disaster Relief",
                 sliderInput("range", "IHP Approved Amt", min= min(owner_zip$Total_Approved_IHP_Amount),max= max(owner_zip$Total_Approved_IHP_Amount),
                             value = range(owner_zip$Total_Approved_IHP_Amount), step = 100
                 ),
+                sliderInput("hpirange", "Hosing Price Index Range", min= min(owner_zip$HPI),max= max(owner_zip$HPI),
+                            value = range(owner_zip$HPI), step = 10
+                ),
                 selectInput("state", "State Abbreviation",
                             unique(owner_zip$State), selected = "CA"
                 ),
@@ -27,11 +30,12 @@ ui <- bootstrapPage(title="FEMA Disaster Relief",
                             rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
                 ),
                 checkboxInput("legend", "Show legend", TRUE),
-                dateRangeInput('dateRange',
-                               label = 'Set Date Range for Disaster:',
-                               start = min(owner_zip$incidentBeginDate), end = max(owner_zip$incidentBeginDate),),
-                plotOutput("barplotState", height = 250)
-                
+                selectInput('dateRange',
+                               label = 'Year of Disaster Occurance:',
+                            sort(unique(owner_zip$year), decreasing = TRUE), selected = "2018"),
+                # plotOutput("barplotState", height = 250,width = 250)
+                tableOutput("view")
+                # tableOutput("hpi")
   )
   #sidebarPanel(bottom=10, left=10, plotOutput("barplotState", height = 250))
 )
